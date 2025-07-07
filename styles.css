@@ -434,6 +434,7 @@ body.dark .song-view-box {
   transform: scale(1.2);
   color: #76ff03;
 }
+#showMoreView,
 #showMoreDelete,
 #showMoreEdit {
   display: block;
