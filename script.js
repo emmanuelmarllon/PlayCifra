@@ -174,25 +174,63 @@ refreshSpeedUI();
    6.  RENDERING
    ────────────────────────────────────────────────────────────────────── */
 function render(list = songs, keepActive = activeSongId) {
-  const searchText = searchInput.value.trim().toLowerCase();
-  const filteredList = !searchText
-    ? list.slice(0, 5) // Limita a 5 se não estiver pesquisando
-    : list;
+  /* ========== 1. Filtro / quais abas mostrar ========== */
+  const query = searchInput.value.trim().toLowerCase();
+  let visible = query
+    ? list // se está pesquisando → todas
+    : list.slice(0, 5); // senão → só 5
 
+  console.log("🔍 query:", query || "(vazio)");
+  console.table(visible.map((s) => s.title));
+
+  /* ========== 2. “current” = música que deve ficar em 1º ========== */
+  const current = keepActive && list.find((s) => s.id === keepActive);
+  console.log("🎯 current", current ? current.title : "nenhum");
+
+  if (current) {
+    visible = [current, ...visible.filter((s) => s.id !== current.id)];
+  }
+  console.table(visible.map((s) => s.title));
+
+  /* ========== 3. Limpa DOM ========== */
   tabsEl.innerHTML = "";
   contentsEl.innerHTML = "";
 
-  filteredList.forEach((song) => {
-    /* Tab */
+  /* ========== 4. Painéis (de TODAS as músicas) ========== */
+  list.forEach((song) => {
+    const pane = document.createElement("div");
+    pane.className = "tab-content";
+    pane.id = song.id;
+
+    const iframe = song.ytId
+      ? `<iframe src="https://www.youtube.com/embed/${song.ytId}"
+                 width="300" height="169" allowfullscreen
+                 style="float:right;margin-left:15px;border-radius:10px;"></iframe>`
+      : "";
+
+    const copyBtn = `<button class="copy-btn"
+                     onclick="copiarTexto(\`${song.cifra.replace(
+                       /`/g,
+                       "\\`"
+                     )}\`)">Copiar cifra</button>`;
+
+    pane.innerHTML = `${iframe}${copyBtn}
+                      <pre><code>${markChords(song.cifra)}</code></pre>`;
+    contentsEl.appendChild(pane);
+  });
+
+  /* ========== 5. Abas (apenas as “visíveis”) ========== */
+  visible.forEach((song) => {
     const tab = document.createElement("button");
     tab.className = "tab-button";
     tab.dataset.id = song.id;
-    tab.innerHTML = `${song.title} <span class="fav-heart" style="color:${
-      song.favorite ? "red" : "#ccc"
-    }">❤</span>`;
-    tabsEl.appendChild(tab);
+    tab.innerHTML = `
+      ${song.title}
+      <span class="fav-heart" style="color:${
+        song.favorite ? "red" : "#ccc"
+      }">❤</span>`;
 
-    // toggle favorito
+    /* toggle favorito */
     tab.querySelector(".fav-heart").onclick = (e) => {
       e.stopPropagation();
       song.favorite = !song.favorite;
@@ -203,34 +241,20 @@ function render(list = songs, keepActive = activeSongId) {
       );
     };
 
+    /* ativar (clique na aba) */
     tab.onclick = (e) => {
-      if (!e.target.classList.contains("fav-heart")) {
-        activate(song.id);
-      }
+      if (!e.target.classList.contains("fav-heart")) activate(song.id);
     };
 
-    /* Panel */
-    const panel = document.createElement("div");
-    panel.className = "tab-content";
-    panel.id = song.id;
-
-    const ytFrame = song.ytId
-      ? `<iframe width="300" height="169" src="https://www.youtube.com/embed/${song.ytId}" allowfullscreen style="float:right;margin-left:15px;border-radius:10px;"></iframe>`
-      : "";
-
-    const copyBtn = `<button class="copy-btn" onclick="copiarTexto(\`${song.cifra.replace(
-      /`/g,
-      "\\`"
-    )}\`)">Copiar cifra</button>`;
-
-    panel.innerHTML = `${ytFrame}${copyBtn}<pre><code>${markChords(
-      song.cifra
-    )}</code></pre>`;
-    contentsEl.appendChild(panel);
+    tabsEl.appendChild(tab);
   });
 
-  if (filteredList.length) activate(keepActive || filteredList[0].id);
-  noResults.style.display = filteredList.length ? "none" : "block";
+  /* ========== 6. Ativa aba / painel ========== */
+  if (visible.length) {
+    activate(current ? current.id : visible[0].id);
+  }
+
+  noResults.style.display = visible.length ? "none" : "block";
 }
 
 function activate(id) {
@@ -427,9 +451,10 @@ function fillViewList() {
     li.className = "song-view-box";
     li.textContent = s.title;
     li.onclick = () => {
-      activate(s.id);
+      render(songs, s.id);
       viewModal.style.display = "none";
     };
+
     viewListEl.appendChild(li);
   });
   showMoreView.style.display =

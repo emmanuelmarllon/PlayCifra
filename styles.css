@@ -111,6 +111,10 @@ body.dark .tab-button {
   color: #fff;
   font-weight: bold;
 }
+body.dark .tab-button.active {
+  background: var(--primary);
+  color: #fff;
+}
 .tab-content {
   display: none;
   background: var(--panel);
