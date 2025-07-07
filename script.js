@@ -8,25 +8,23 @@ const STORAGE_KEY = "adols_songs";
 const getSongs = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 const setSongs = (arr) =>
   localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-localStorage.setItem("teste", "ok");
-console.log(localStorage.getItem("teste")); // Deve mostrar 'o
 /* ────────────────────────────────────────────────────────────────────────
    2.  DOM  REFERENCES
    ────────────────────────────────────────────────────────────────────── */
 const $ = (id) => document.getElementById(id);
 
-// 2.1 – Navegação & conteúdo
+// 2.1 – Área principal
 const tabsEl = $("tabs");
 const contentsEl = $("contents");
 const searchInput = $("searchInput");
 const noResults = $("noResults");
 
-// 2.2 – Toolbar & short‑cuts
-const toolbar = document.querySelector(".toolbar");
+// 2.2 – Toolbar
 const topBtn = $("topBtn");
 const openAddBtn = $("openModal");
 const openDelBtn = $("openDeleteModal");
 const openEditListBtn = $("openEditModal");
+const openViewModal = $("openViewModal");
 const exportBtn = $("exportBtn");
 const importBtn = $("importBtn");
 const importFile = $("importFile");
@@ -34,12 +32,13 @@ const importAppendBtn = $("importAppendBtn");
 const importAppendFile = $("importAppendFile");
 const filterFavoritesBtn = $("filterFavoritesBtn");
 
-// 2.3 – Modais (Add/Edit, Delete list, Edit list)
+// 2.3 – Modais
 const addEditModal = $("modal");
 const deleteModal = $("deleteModal");
 const editListModal = $("editListModal");
+const viewModal = $("viewModal");
 
-// 2.4 – Campos modal Add/Edit
+// 2.4 – Campos Add/Edit
 const modalTitle = $("modalTitle");
 const titleField = $("titleField");
 const keyField = $("keyField");
@@ -51,17 +50,23 @@ const ytLinkField = $("ytLinkField");
 const cancelBtn = $("cancelBtn");
 const saveBtn = $("saveBtn");
 
-// 2.5 – Campos modais auxiliares
+// 2.5 – Campos Delete / Edit / View
 const searchDeleteInput = $("searchDeleteInput");
 const deleteListEl = $("deleteSongList");
 const showMoreDelete = $("showMoreDelete");
 const closeDeleteModal = $("closeDeleteModal");
+
 const searchEditInput = $("searchEditInput");
 const editListEl = $("editSongList");
 const showMoreEdit = $("showMoreEdit");
 const closeEditListModal = $("closeEditListModal");
 
-// 2.6 – Scroll control
+const searchViewInput = $("searchViewInput");
+const viewListEl = $("viewSongList");
+const showMoreView = $("showMoreView");
+const closeViewModal = $("closeViewModal");
+
+// 2.6 – Scroll
 const speedValueEl = $("speedValue");
 const decBtn = $("decreaseSpeed");
 const incBtn = $("increaseSpeed");
@@ -78,32 +83,29 @@ let activeSongId = null;
 let editingId = null;
 let filterFavorites = false;
 
-/*  Scroll / auto‑scroll */
+// scroll
 let speed = 0;
 const SPEED_STEP = 0.2;
 let scrollTicker = null;
 let scrollAcc = 0;
 
-/*  Pagination offsets for delete/edit lists */
+// paginação
 let delOffset = 0;
 let editOffset = 0;
+let viewOffset = 0;
 const PAGE_STEP = 5;
 
 /* ────────────────────────────────────────────────────────────────────────
    4.  HELPERS
    ────────────────────────────────────────────────────────────────────── */
-const slug = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-// Regex ultra‑flexível para acordes
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 const CHORD_RE =
   /\b([A-G](?:#|b)?(?:7M|maj7|m7b5|m7|m|7sus4|7sus2|7|sus4|sus2|dim7?|aug|add9?|6|9|11|13|4)?(?:\(\#?\d+\))?(?:\/[A-G](?:#|b)?)?)\b/gi;
-
-const markChords = (txt) =>
-  txt.replace(CHORD_RE, '<span class="acorde">$1</span>');
+const markChords = (t) => t.replace(CHORD_RE, '<span class="acorde">$1</span>');
 
 const ICONS = { cima: "⬆", baixo: "⬇" };
-const toArrows = (txt) =>
-  txt
+const toArrows = (text) =>
+  text
     .split(" ")
     .map((w) => ICONS[w.toLowerCase()] || w)
     .join(" ");
@@ -113,46 +115,12 @@ const youtubeId = (url) =>
     /^(?:.*(?:youtu\.be\/|v\/|embed\/|watch\?v=))([^#&?]{11}).*/
   )?.[1] || null;
 
-const copyToClipboard = (text) =>
-  navigator.clipboard.writeText(text).then(() => alert("Cifra copiada!"));
+const copyToClipboard = (t) =>
+  navigator.clipboard.writeText(t).then(() => alert("Cifra copiada!"));
 
 /* ────────────────────────────────────────────────────────────────────────
    5.  SCROLL CONTROL
    ────────────────────────────────────────────────────────────────────── */
-
-// liga/desliga auto‑scroll
-toggleDownBtn.onclick = () =>
-  scrollTicker ? stopAutoScroll() : startAutoScroll();
-
-// aumenta velocidade
-incBtn.onclick = () => {
-  speed = Math.min(10, speed + SPEED_STEP);
-  refreshSpeedUI();
-  if (scrollTicker) {
-    stopAutoScroll();
-    startAutoScroll();
-  }
-};
-
-// diminui velocidade
-decBtn.onclick = () => {
-  speed = Math.max(0, speed - SPEED_STEP);
-  refreshSpeedUI();
-  if (scrollTicker) {
-    stopAutoScroll();
-    if (speed) startAutoScroll();
-  }
-};
-
-// botão voltar ao topo
-topBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-// mostrar / esconder o botão ↑
-window.addEventListener("scroll", () => {
-  topBtn.style.display = window.scrollY > 100 ? "block" : "none";
-});
-topBtn.style.display = "none"; // estado inicial
-refreshSpeedUI(); // mostra "0.0"
 function refreshSpeedUI() {
   speedValueEl.textContent = speed.toFixed(1);
   toggleDownBtn.disabled = speed === 0;
@@ -177,15 +145,44 @@ function stopAutoScroll() {
   scrollTicker = null;
   toggleDownBtn.textContent = "Auto ↓";
 }
+toggleDownBtn.onclick = () =>
+  scrollTicker ? stopAutoScroll() : startAutoScroll();
+incBtn.onclick = () => {
+  speed = Math.min(10, speed + SPEED_STEP);
+  refreshSpeedUI();
+  if (scrollTicker) {
+    stopAutoScroll();
+    startAutoScroll();
+  }
+};
+decBtn.onclick = () => {
+  speed = Math.max(0, speed - SPEED_STEP);
+  refreshSpeedUI();
+  if (scrollTicker) {
+    stopAutoScroll();
+    if (speed) startAutoScroll();
+  }
+};
+topBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+window.addEventListener("scroll", () => {
+  topBtn.style.display = window.scrollY > 100 ? "block" : "none";
+});
+topBtn.style.display = "none";
+refreshSpeedUI();
 
 /* ────────────────────────────────────────────────────────────────────────
    6.  RENDERING
    ────────────────────────────────────────────────────────────────────── */
 function render(list = songs, keepActive = activeSongId) {
+  const searchText = searchInput.value.trim().toLowerCase();
+  const filteredList = !searchText
+    ? list.slice(0, 5) // Limita a 5 se não estiver pesquisando
+    : list;
+
   tabsEl.innerHTML = "";
   contentsEl.innerHTML = "";
 
-  list.forEach((song) => {
+  filteredList.forEach((song) => {
     /* Tab */
     const tab = document.createElement("button");
     tab.className = "tab-button";
@@ -205,8 +202,12 @@ function render(list = songs, keepActive = activeSongId) {
         activeSongId
       );
     };
-    tab.onclick = (e) =>
-      !e.target.classList.contains("fav-heart") && activate(song.id);
+
+    tab.onclick = (e) => {
+      if (!e.target.classList.contains("fav-heart")) {
+        activate(song.id);
+      }
+    };
 
     /* Panel */
     const panel = document.createElement("div");
@@ -228,8 +229,8 @@ function render(list = songs, keepActive = activeSongId) {
     contentsEl.appendChild(panel);
   });
 
-  if (list.length) activate(keepActive || list[0].id);
-  noResults.style.display = list.length ? "none" : "block";
+  if (filteredList.length) activate(keepActive || filteredList[0].id);
+  noResults.style.display = filteredList.length ? "none" : "block";
 }
 
 function activate(id) {
@@ -243,7 +244,7 @@ function activate(id) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   7.  CRUD – Add / Edit / Delete helpers
+   7.  CRUD – Add / Edit / Delete / View helpers
    ────────────────────────────────────────────────────────────────────── */
 /*********************** ADD / EDIT *************************/
 openAddBtn.onclick = () => openEditModal(null);
@@ -389,6 +390,49 @@ function fillEditList() {
     };
   });
   showMoreEdit.style.display =
+    filtered.length > slice.length ? "block" : "none";
+}
+/*********************** VIEW ALL MODAL **************/
+openViewModal.onclick = () => {
+  viewOffset = 0;
+  searchViewInput.value = "";
+  fillViewList();
+  viewModal.style.display = "block";
+};
+closeViewModal.onclick = () => (viewModal.style.display = "none");
+searchViewInput.oninput = () => {
+  viewOffset = 0;
+  fillViewList();
+};
+showMoreView.onclick = () => {
+  viewOffset += PAGE_STEP;
+  fillViewList();
+};
+
+function fillViewList() {
+  viewListEl.innerHTML = "";
+  const norm = (s) =>
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  const q = norm(searchViewInput.value.trim());
+
+  let base = filterFavorites ? songs.filter((s) => s.favorite) : songs;
+  const filtered = base.filter((s) => norm(s.title).includes(q));
+  const slice = filtered.slice(0, viewOffset + PAGE_STEP);
+
+  slice.forEach((s) => {
+    const li = document.createElement("li");
+    li.className = "song-view-box";
+    li.textContent = s.title;
+    li.onclick = () => {
+      activate(s.id);
+      viewModal.style.display = "none";
+    };
+    viewListEl.appendChild(li);
+  });
+  showMoreView.style.display =
     filtered.length > slice.length ? "block" : "none";
 }
 /* ────────────────────────────────────────────────────────────────────────

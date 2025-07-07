@@ -41,9 +41,9 @@
         placeholder="Pesquisar música..."
         autocomplete="off"
       />
+      <div class="tabs" id="tabs"></div>
       <!-- Navegação -->
       <div class="toolbar">
-        <div class="tabs" id="tabs"></div>
         <button class="add-btn" id="openModal" title="Adicionar nova música">
           + Música
         </button>
@@ -55,6 +55,9 @@
         </button>
         <button id="filterFavoritesBtn" title="Filtrar favoritos">
           ❤️ Favoritos
+        </button>
+        <button class="view-btn" id="openViewModal" title="Listar todas">
+          Mostrar Todas
         </button>
         <button
           class="export-btn"
@@ -183,6 +186,25 @@
           <button id="showMoreEdit">Mostrar mais</button>
           <div class="actions">
             <button class="cancel-btn" id="closeEditListModal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <!-- Modal listar todas -->
+      <div class="modal" id="viewModal">
+        <div class="modal-box">
+          <h2>Todas as músicas</h2>
+
+          <input
+            type="text"
+            id="searchViewInput"
+            placeholder="Pesquisar música..."
+          />
+
+          <ul id="viewSongList" class="list-scrollable"></ul>
+          <button id="showMoreView">Mostrar mais</button>
+
+          <div class="actions">
+            <button class="cancel-btn" id="closeViewModal">Fechar</button>
           </div>
         </div>
       </div>

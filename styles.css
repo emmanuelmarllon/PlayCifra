@@ -9,7 +9,7 @@
   --text-light: #000;
 }
 
-/* ===== LAYOUT GERAL ===== */
+/* RESET & BASE */
 * {
   box-sizing: border-box;
 }
@@ -20,14 +20,14 @@ body {
   margin: 0;
   transition: background 0.3s, color 0.3s;
 }
+body.dark {
+  background: var(--bg-light);
+  color: var(--text-light);
+}
 main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-}
-body.dark {
-  background: var(--bg-light);
-  color: var(--text-light);
 }
 h1 {
   margin: 0 0 10px;
@@ -35,8 +35,15 @@ h1 {
   align-items: center;
   justify-content: space-between;
 }
-
-/* ===== SEARCH ===== */
+iframe {
+  border: none;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  box-shadow: 1 1 20px rgba(0, 0, 0, 0.7);
+  margin: 20px 0;
+  height: 400px;
+}
+/* SEARCH */
 #searchInput,
 #searchDeleteInput {
   width: 100%;
@@ -50,13 +57,12 @@ h1 {
   box-shadow: inset 0 0 5px var(--primary);
   font-size: 1rem;
   margin-bottom: 15px;
-  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  transition: 0.3s;
 }
 body.dark #searchInput,
 body.dark #searchDeleteInput {
   background: var(--panel-light);
   color: var(--text-light);
-  box-shadow: inset 0 0 5px var(--primary);
 }
 #searchInput::placeholder,
 #searchDeleteInput::placeholder {
@@ -67,11 +73,14 @@ body.dark #searchDeleteInput {
   box-shadow: 0 0 7px #76ff03;
 }
 
-/* ===== TABS ===== */
+/* TABS */
 .tabs {
   display: flex;
+  flex-direction: column;
   gap: 10px;
+  margin: 20px 0;
   overflow-x: auto;
+  flex-wrap: wrap;
   scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar {
@@ -81,16 +90,17 @@ body.dark #searchDeleteInput {
   background: #1f1f1f;
   color: #ccc;
   border: none;
-  cursor: pointer;
   border-radius: 5px;
   padding: 8px 16px;
+  min-width: 100px;
+  cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 6px;
-  transition: background 0.3s, color 0.3s;
+  transition: 0.3s;
 }
 body.dark .tab-button {
   background: var(--panel-light);
@@ -108,65 +118,62 @@ body.dark .tab-button {
   border-radius: 8px;
   margin-top: 10px;
   white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
   font-family: monospace;
   font-size: 1.1rem;
-  transition: background 0.3s, color 0.3s;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.3s;
 }
 body.dark .tab-content {
   background: var(--panel-light);
   color: var(--text-light);
 }
+.tab-content code {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  display: block;
+}
+.tab-content pre {
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.tab-content pre code {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  display: block;
+}
 .tab-content.active {
   display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 code span.acorde {
   color: var(--primary);
   font-weight: bold;
 }
 
-/* ===== TOOLBAR & BTNS ===== */
+/* TOOLBAR & BTNS */
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-  flex-wrap: wrap;
 }
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-  }
-}
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-  }
-}
-.toolbar.pulse {
-  animation: pulse 1.2s ease-out;
-}
-
-.toolbar.pulse {
-  animation: pulse 1.2s ease-out;
-}
-
 .add-btn,
 .delete-btn,
 .edit-btn,
 .import-append-btn,
 #filterFavoritesBtn,
+.view-btn,
 .export-btn,
 .import-btn {
   background: var(--primary);
@@ -178,23 +185,22 @@ code span.acorde {
   font-weight: bold;
   transition: background 0.3s;
 }
+.add-btn:hover,
+.edit-btn:hover,
+.copy-btn:hover,
+.toggle-btn:hover {
+  background: #5bca00;
+}
 .delete-btn {
   background-color: rgb(182, 1, 1);
 }
 .delete-btn:hover {
   background-color: rgb(255, 0, 0);
 }
-.add-btn:hover {
-  background: #5bca00;
-}
 .edit-btn {
-  background: #4caf50;
   display: flex;
   align-items: center;
   gap: 6px;
-}
-.edit-btn:hover {
-  background: #5bca00;
 }
 .edit-btn i {
   font-style: normal;
@@ -206,38 +212,34 @@ code span.acorde {
   color: #b00;
   padding: 8px 12px;
   font-weight: normal;
-  border-radius: 6px;
 }
 #filterFavoritesBtn:hover {
   background: #ffb3b3;
 }
 
-/* ===== COPY BTN ===== */
+/* COPY BUTTON */
 .copy-btn {
-  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: bold;
   background: var(--primary);
   color: #fff;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-.copy-btn:hover {
-  background: #5bca00;
+  margin: 0;
+  transition: 0.3s;
 }
 
-/* ===== SCROLL CONTROL ===== */
+/* SCROLL CONTROL */
 .scroll {
   position: fixed;
   top: 50%;
   right: 15px;
   transform: translateY(-50%);
+  z-index: 999;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  z-index: 999;
   gap: 10px;
   user-select: none;
 }
@@ -249,9 +251,8 @@ code span.acorde {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
   color: var(--text);
-  transition: background 0.3s, color 0.3s;
+  gap: 6px;
 }
 body.dark .scroll-control {
   background: var(--panel-light);
@@ -269,7 +270,6 @@ body.dark .scroll-control {
   font-size: 18px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 .btn-speed:hover {
   background: var(--primary);
@@ -289,9 +289,6 @@ body.dark .scroll-control {
   font-weight: bold;
   font-size: 14px;
 }
-.toggle-btn:hover {
-  background: #5bca00;
-}
 .top-button {
   background: #444;
   color: #fff;
@@ -302,13 +299,12 @@ body.dark .scroll-control {
   font-size: 20px;
   cursor: pointer;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-  transition: background 0.2s;
+  transition: 0.2s;
 }
 .top-button:hover {
   background: var(--primary);
 }
-
-/* ===== MODALS ===== */
+/* MODALS */
 .modal {
   display: none;
   position: fixed;
@@ -320,16 +316,15 @@ body.dark .scroll-control {
 }
 .modal-box {
   background: #2a2a2a;
-  margin: auto;
+  color: var(--text);
   padding: 20px;
+  margin: auto;
   border-radius: 10px;
   max-width: 500px;
   width: 100%;
-  color: var(--text);
-  transition: background 0.3s, color 0.3s;
 }
 body.dark .modal-box {
-  background: var(--panel-light);
+  background: var(--bg-light);
   color: var(--text-light);
 }
 .modal-box h2 {
@@ -340,8 +335,7 @@ body.dark .modal-box {
   margin-top: 12px;
   font-weight: bold;
 }
-.modal-box input[type="text"],
-.modal-box input[type="number"],
+.modal-box input,
 .modal-box textarea {
   width: 100%;
   padding: 8px 10px;
@@ -350,12 +344,10 @@ body.dark .modal-box {
   border-radius: 6px;
   background: #444;
   color: #fff;
-  transition: background 0.3s, color 0.3s;
 }
-body.dark .modal-box input[type="text"],
-body.dark .modal-box input[type="number"],
+body.dark .modal-box input,
 body.dark .modal-box textarea {
-  background: var(--bg-light);
+  background: var(--panel-light);
   color: var(--text-light);
 }
 .modal-box textarea {
@@ -365,34 +357,36 @@ body.dark .modal-box textarea {
 }
 .modal-box .actions {
   display: flex;
-  gap: 10px;
   justify-content: flex-end;
+  gap: 10px;
   margin-top: 18px;
+}
+.save-btn,
+.cancel-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
 }
 .save-btn {
   background: var(--primary);
-  color: #fff;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
 }
 .cancel-btn {
   background: #c0392b;
-  color: #fff;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
-/* ===== DELETE LIST ===== */
-#deleteSongList {
+/* DELETE/EDIT/VIEW LISTS */
+#deleteSongList,
+#editSongList,
+#viewSongList {
   list-style: none;
   padding: 0;
   margin: 15px 0;
 }
-.song-delete-box {
+.song-delete-box,
+.song-edit-box,
+.song-view-box {
   background: #333;
   padding: 10px 14px;
   border-radius: 6px;
@@ -402,85 +396,45 @@ body.dark .modal-box textarea {
   margin-bottom: 10px;
   transition: background 0.3s;
 }
-body.dark .song-delete-box {
+.song-view-box {
+  cursor: pointer;
+}
+.song-view-box:hover {
+  background: var(--bg);
+}
+body.dark .song-view-box:hover {
+  background: var(--text-dim);
+}
+body.dark .song-delete-box,
+body.dark .song-edit-box,
+body.dark .song-view-box {
   background: var(--panel-light);
   color: var(--text-light);
 }
-.song-delete-box button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  color: red;
-  transition: transform 0.2s ease, color 0.3s ease;
-}
-.song-delete-box button:hover {
-  transform: scale(1.2);
-  color: #ff4d4d;
-}
-
-/* Mostrar mais botão delete */
-#showMoreDelete {
-  display: block;
-  margin: 0 auto 10px;
-  background: #555;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-#showMoreDelete:hover {
-  background: #777;
-}
-
-/* ===== EDIT LIST ===== */
-#editSongList {
-  list-style: none;
-  padding: 0;
-  margin: 15px 0;
-}
-.song-edit-box {
-  background: #333;
-  padding: 10px 14px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  transition: background 0.3s;
-}
-.theme-toggle {
-  cursor: pointer;
-  border: none;
-  font-size: 20px;
-  padding: 10px;
-  background-color: var(--primary);
-  transition: background-color 0.3s;
-  border-radius: 50%;
-}
-.theme-toggle:hover {
-  background-color: var(--text-dim);
-}
-body.dark .song-edit-box {
-  background: var(--panel-light);
-  color: var(--text-light);
-}
+.song-delete-box button,
 .song-edit-box button {
   background: transparent;
   border: none;
   cursor: pointer;
   font-size: 20px;
+  transition: 0.3s ease;
+}
+
+.song-delete-box button {
+  color: red;
+}
+.song-delete-box button:hover {
+  transform: scale(1.2);
+  color: #ff4d4d;
+}
+.song-edit-box button {
   color: #4caf50;
-  transition: transform 0.2s ease, color 0.3s ease;
 }
 .song-edit-box button:hover {
   transform: scale(1.2);
   color: #76ff03;
 }
-
-/* Mostrar mais botão edit */
+#showMoreDelete,
 #showMoreEdit {
   display: block;
   margin: 0 auto 10px;
@@ -490,26 +444,104 @@ body.dark .song-edit-box {
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: 0.2s ease;
 }
+#showMoreDelete:hover,
 #showMoreEdit:hover {
   background: #777;
 }
 
-/* ===== NO RESULTS ===== */
+/* THEME TOGGLE */
+.theme-toggle {
+  cursor: pointer;
+  border: none;
+  font-size: 20px;
+  padding: 10px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+.theme-toggle:hover {
+  background-color: var(--text-dim);
+}
+
+/* NO RESULTS */
 #noResults {
   display: none;
   margin-top: 20px;
   color: var(--text);
   text-align: center;
   font-style: italic;
-  transition: color 0.3s;
 }
 body.dark #noResults {
   color: var(--text-light);
 }
 
-/* ===== RESPONSIVO ===== */
+/* FOOTER */
+.footer {
+  background-color: #181818;
+  color: #ccc;
+  padding-top: 40px;
+  border-top: 1px solid #333;
+  font-family: "Poppins", sans-serif;
+}
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 10%;
+}
+.footer-section {
+  flex: 1 1 250px;
+  margin-bottom: 30px;
+}
+.footer-section h3,
+.footer-section h4 {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+.footer-section p,
+.footer-section li {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+.footer-section a {
+  color: #4fc3f7;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.footer-section a:hover {
+  color: #81d4fa;
+  text-decoration: underline;
+}
+.footer-bottom {
+  text-align: center;
+  padding: 20px 10%;
+  background-color: #111;
+  font-size: 13px;
+  color: #777;
+  border-top: 1px solid #222;
+}
+.footer-section i {
+  margin-right: 8px;
+  color: #4fc3f7;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    padding: 0 5%;
+  }
+  .footer-section {
+    margin-bottom: 25px;
+  }
+}
 @media (max-width: 600px) {
   .tab-button {
     padding: 6px 10px;
@@ -524,80 +556,5 @@ body.dark #noResults {
   }
   #speedValue {
     font-size: 14px;
-  }
-}
-.footer {
-  background-color: #181818;
-  color: #ccc;
-  padding-top: 40px;
-  font-family: "Poppins", sans-serif;
-  border-top: 1px solid #333;
-}
-
-.footer-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 0 10%;
-}
-
-.footer-section {
-  flex: 1 1 250px;
-  margin-bottom: 30px;
-}
-
-.footer-section h3,
-.footer-section h4 {
-  color: #fff;
-  margin-bottom: 15px;
-  font-size: 18px;
-}
-
-.footer-section p,
-.footer-section li {
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-section a {
-  color: #4fc3f7;
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-.footer-section a:hover {
-  color: #81d4fa;
-  text-decoration: underline;
-}
-
-.footer-bottom {
-  text-align: center;
-  padding: 20px 10%;
-  background-color: #111;
-  font-size: 13px;
-  color: #777;
-  border-top: 1px solid #222;
-}
-
-/* Ícones opcionais se quiser usar FontAwesome */
-.footer-section i {
-  margin-right: 8px;
-  color: #4fc3f7;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-  .footer-container {
-    flex-direction: column;
-    padding: 0 5%;
-  }
-
-  .footer-section {
-    margin-bottom: 25px;
   }
 }
