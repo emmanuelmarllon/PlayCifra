@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PlayCifra</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      body.dark {
+        background: #fff;
+        color: #000;
+      }
+      .dark .tab-content {
+        background: #ddd;
+      }
+      .theme-toggle {
+        float: right;
+        margin: 10px;
+      }
+      .copy-btn {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>
+        PlayCifra
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </h1>
+      <!-- Barra de pesquisa -->
+      <input
+        id="searchInput"
+        placeholder="Pesquisar música..."
+        autocomplete="off"
+      />
+      <!-- Navegação -->
+      <div class="toolbar">
+        <div class="tabs" id="tabs"></div>
+        <button class="add-btn" id="openModal" title="Adicionar nova música">
+          + Música
+        </button>
+        <button class="delete-btn" id="openDeleteModal" title="Deletar músicas">
+          🗑️
+        </button>
+        <button class="edit-btn" id="openEditModal" title="Editar música">
+          ✏️
+        </button>
+        <button id="filterFavoritesBtn" title="Filtrar favoritos">
+          ❤️ Favoritos
+        </button>
+        <button
+          class="export-btn"
+          id="exportBtn"
+          title="Exportar todas as músicas"
+        >
+          Exportar
+        </button>
+        <button
+          class="import-btn"
+          id="importBtn"
+          title="Importar (substitui as músicas atuais)"
+        >
+          Importar
+        </button>
+        <button
+          class="import-append-btn"
+          id="importAppendBtn"
+          title="Importar sem apagar as músicas atuais, adiciona as novas"
+        >
+          Importar sem deletar
+        </button>
+        <input
+          type="file"
+          id="importFile"
+          style="display: none"
+          accept=".json"
+        />
+        <input
+          type="file"
+          id="importAppendFile"
+          style="display: none"
+          accept=".json"
+        />
+      </div>
+      <!-- Conteúdo das músicas -->
+      <div id="contents"></div>
+      <p id="noResults">Nenhuma musica encontrada...</p>
+      <!-- Controle de scroll -->
+      <div class="scroll" id="scrollCtrl">
+        <div class="scroll-control">
+          <!-- Botão voltar topo -->
+          <button id="topBtn" title="Topo" class="top-button">↑</button>
+          <label>Velocidade:</label>
+          <button class="btn-speed" id="decreaseSpeed">−</button>
+          <span id="speedValue">0.0</span>
+          <button class="btn-speed" id="increaseSpeed">+</button>
+          <button class="toggle-btn" id="toggleDown">Auto ↓</button>
+        </div>
+      </div>
+      <!-- ========= MODAIS ========= -->
+      <!-- Modal adicionar/editar -->
+      <div class="modal" id="modal">
+        <div class="modal-box">
+          <h2 id="modalTitle">Nova Música</h2>
+          <label>Título</label>
+          <input type="text" id="titleField" autocomplete="off" />
+          <label>Tom:</label>
+          <input
+            type="text"
+            id="keyField"
+            placeholder="Ex: G"
+            autocomplete="off"
+          />
+          <label>Capotraste?</label>
+          <input type="checkbox" id="capoCheck" />
+          <input
+            type="number"
+            id="capoCasa"
+            min="1"
+            max="12"
+            placeholder="Casa"
+            style="width: 80px; display: none"
+          />
+          <label>Ritmo</label>
+          <input
+            type="text"
+            id="ritmoField"
+            placeholder="cima baixo cima"
+            autocomplete="off"
+          />
+          <label>Cifra</label>
+          <textarea
+            id="cifraField"
+            placeholder="Cole a cifra aqui..."
+          ></textarea>
+          <label>Link YouTube (opcional)</label>
+          <input
+            type="text"
+            id="ytLinkField"
+            placeholder="https://www.youtube.com/watch?v=..."
+            autocomplete="off"
+          />
+          <div class="actions">
+            <button class="cancel-btn" id="cancelBtn">Cancelar</button>
+            <button class="save-btn" id="saveBtn">Salvar</button>
+          </div>
+        </div>
+      </div>
+      <!-- Modal deletar -->
+      <div class="modal" id="deleteModal">
+        <div class="modal-box">
+          <h2>Deletar Música</h2>
+          <input
+            type="text"
+            id="searchDeleteInput"
+            placeholder="Pesquisar música..."
+          />
+          <ul id="deleteSongList"></ul>
+          <button id="showMoreDelete">Mostrar mais</button>
+          <div class="actions">
+            <button class="cancel-btn" id="closeDeleteModal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <!-- Modal editar lista -->
+      <div class="modal" id="editListModal">
+        <div class="modal-box">
+          <h2>Editar Música</h2>
+          <input
+            type="text"
+            id="searchEditInput"
+            placeholder="Pesquisar música..."
+          />
+          <ul id="editSongList"></ul>
+          <button id="showMoreEdit">Mostrar mais</button>
+          <div class="actions">
+            <button class="cancel-btn" id="closeEditListModal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section about">
+          <h3>PlayCifra 🎶</h3>
+          <p>
+            Seu lugar para guardar, editar e curtir cifras de todos os estilos.
+            Rápido, leve e feito com amor por música.
+          </p>
+        </div>
+
+        <div class="footer-section links">
+          <h4>Links úteis</h4>
+          <ul>
+            <li><a href="#" id="linkFavorites">🎵 Minhas favoritas</a></li>
+            <li><a href="#" id="linkTools">🛠️ Importar / Exportar</a></li>
+            <li>
+              <a
+                href="https://github.com/marlonemanuel/playcifra"
+                target="_blank"
+                >📁 Código fonte (GitHub)</a
+              >
+            </li>
+            <li><a href="mailto:contato@playcifra.com">📬 Suporte</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section contato">
+          <h4>Contato</h4>
+          <p><i class="fa fa-envelope"></i> email</p>
+          <p>
+            <i class="fa fa-github"></i>
+            <a href="https://github.com/" target="_blank">GitHub</a>
+          </p>
+          <p>
+            <i class="fa fa-instagram"></i>
+            <a href="https://instagram.com/" target="_blank">@seuuser</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          &copy; 2025 <strong>Marlon Emanuel</strong> — Todos os direitos
+          reservados.
+        </p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
