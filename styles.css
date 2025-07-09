@@ -395,10 +395,25 @@ body.dark .modal-box {
   width: 100%;
   padding: 8px 10px;
   border: none;
+
   margin: 10px 0;
   border-radius: 6px;
   background: #444;
   color: #fff;
+}
+select {
+  appearance: none;
+}
+select:focus {
+  border: none;
+  outline: none;
+}
+
+/* no foco, tira o contorno */
+select:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 body.dark .modal-box input,
 body.dark .modal-box textarea {
@@ -453,29 +468,35 @@ body.dark .modal-box textarea {
 }
 
 /* Chrome, Edge, Safari */
+#colorSelect::-webkit-scrollbar,
+#cifraField::-webkit-scrollbar,
 #deleteSongList::-webkit-scrollbar,
 #editSongList::-webkit-scrollbar,
 #viewSongList::-webkit-scrollbar {
   width: 8px;
 }
-
-#deleteSongList::-webkit-scrollbar,
-#editSongList::-webkit-scrollbar,
+#colorSelect::-webkit-scrollbar-track,
+#cifraField::-webkit-scrollbar-track,
+#deleteSongList::-webkit-scrollbar-track,
+#editSongList::-webkit-scrollbar-track,
 #viewSongList::-webkit-scrollbar-track {
   background: #222;
   border-radius: 4px;
 }
 
-#deleteSongList::-webkit-scrollbar,
-#editSongList::-webkit-scrollbar,
+#colorSelect::-webkit-scrollbar-thumb,
+#cifraField::-webkit-scrollbar-thumb,
+#deleteSongList::-webkit-scrollbar-thumb,
+#editSongList::-webkit-scrollbar-thumb,
 #viewSongList::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 4px;
   border: 2px solid #222;
 }
-
-#deleteSongList::-webkit-scrollbar,
-#editSongList::-webkit-scrollbar,
+#colorSelect::-webkit-scrollbar-thumb:hover,
+#cifraField::-webkit-scrollbar-thumb:hover,
+#deleteSongList::-webkit-scrollbar-thumb:hover,
+#editSongList::-webkit-scrollbar-thumb:hover,
 #viewSongList::-webkit-scrollbar-thumb:hover {
   background-color: var(--primary);
 }
