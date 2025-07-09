@@ -1,5 +1,7 @@
 :root {
   --primary: #4caf50;
+  --shadow-color: rgba(76, 175, 80, 0.5);
+  --hover-color: #388e3c;
   --bg: #121212;
   --panel: #222;
   --text: #eee;
@@ -20,6 +22,7 @@ body {
   margin: 0;
   transition: background 0.3s, color 0.3s;
 }
+
 body.dark {
   background: var(--bg-light);
   color: var(--text-light);
@@ -41,8 +44,44 @@ iframe {
   aspect-ratio: 16 / 9;
   box-shadow: 1 1 20px rgba(0, 0, 0, 0.7);
   margin: 20px 0;
-  height: 400px;
+  height: auto;
 }
+input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-dim);
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Checkmark minimalista */
+input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked::after {
+  opacity: 1;
+}
+
 /* SEARCH */
 #searchInput,
 #searchDeleteInput {
@@ -70,7 +109,7 @@ body.dark #searchDeleteInput {
 }
 #searchInput:focus,
 #searchDeleteInput:focus {
-  box-shadow: 0 0 7px #76ff03;
+  box-shadow: 0 0 7px var(--shadow-color);
 }
 
 /* TABS */
@@ -130,6 +169,18 @@ body.dark .tab-button.active {
   opacity: 0;
   transform: translateY(10px);
   transition: 0.3s;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 body.dark .tab-content {
   background: var(--panel-light);
@@ -193,7 +244,7 @@ code span.acorde {
 .edit-btn:hover,
 .copy-btn:hover,
 .toggle-btn:hover {
-  background: #5bca00;
+  background: var(--hover-color);
 }
 .delete-btn {
   background-color: rgb(182, 1, 1);
@@ -251,7 +302,7 @@ code span.acorde {
   background: #1f1f1f;
   padding: 10px 12px;
   border-radius: 10px;
-  box-shadow: 0 0 8px rgba(0, 255, 100, 0.4);
+  box-shadow: 0 0 8px var(--shadow-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -386,8 +437,49 @@ body.dark .modal-box textarea {
 #viewSongList {
   list-style: none;
   padding: 0;
+  max-height: 300px; /* limita a altura, ajusta como quiser */
+  overflow-y: auto;
   margin: 15px 0;
 }
+#deleteSongList,
+#editSongList,
+#viewSongList {
+  max-height: 300px;
+  overflow-y: auto;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #222;
+}
+
+/* Chrome, Edge, Safari */
+#deleteSongList::-webkit-scrollbar,
+#editSongList::-webkit-scrollbar,
+#viewSongList::-webkit-scrollbar {
+  width: 8px;
+}
+
+#deleteSongList::-webkit-scrollbar,
+#editSongList::-webkit-scrollbar,
+#viewSongList::-webkit-scrollbar-track {
+  background: #222;
+  border-radius: 4px;
+}
+
+#deleteSongList::-webkit-scrollbar,
+#editSongList::-webkit-scrollbar,
+#viewSongList::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 4px;
+  border: 2px solid #222;
+}
+
+#deleteSongList::-webkit-scrollbar,
+#editSongList::-webkit-scrollbar,
+#viewSongList::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
 .song-delete-box,
 .song-edit-box,
 .song-view-box {
@@ -455,6 +547,33 @@ body.dark .song-view-box {
 #showMoreEdit:hover {
   background: #777;
 }
+/* Botões de Config e Tema */
+#btn {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.settings-btn,
+.theme-toggle {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s;
+  box-shadow: 0 0 8px var(--shadow-color);
+}
+.settings-btn:hover,
+.theme-toggle:hover {
+  background-color: var(--hover-color);
+  box-shadow: 0 0 12px var(--shadow-color);
+}
 
 /* THEME TOGGLE */
 .theme-toggle {
@@ -469,13 +588,16 @@ body.dark .song-view-box {
 .theme-toggle:hover {
   background-color: var(--text-dim);
 }
+/* SETTINGS  */
 
 /* NO RESULTS */
 #noResults {
+  height: 60vh;
   display: none;
   margin-top: 20px;
   color: var(--text);
   text-align: center;
+  font-size: 1.2rem;
   font-style: italic;
 }
 body.dark #noResults {
@@ -556,10 +678,187 @@ body.dark #noResults {
     gap: 6px;
     padding-bottom: 10px;
   }
+  .scroll {
+    right: 5px;
+    top: auto;
+    bottom: 50px;
+    transform: none;
+    flex-direction: row;
+  }
   .modal-box {
     padding: 15px;
   }
   #speedValue {
     font-size: 14px;
+  }
+}
+/* Botões de Config e Tema */
+#btn {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.settings-btn,
+.theme-toggle {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s;
+  box-shadow: 0 0 8px var(--shadow-color);
+}
+
+.settings-btn:hover,
+.theme-toggle:hover {
+  background-color: var(--hover-color);
+  box-shadow: 0 0 12px var(--shadow-color);
+}
+
+/* Modal Configuração */
+.modal-config {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1500;
+  padding: 20px;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+
+.modal-config.active {
+  display: block;
+}
+
+.modal-config .modal-box {
+  background: var(--panel);
+  color: var(--text);
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px var(--shadow-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark .modal-config .modal-box {
+  background: var(--panel-light);
+  color: var(--text-light);
+}
+
+.modal-config h2 {
+  margin-top: 0;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--primary);
+}
+
+.modal-config label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+body.dark .modal-config label {
+  color: var(--text-light);
+}
+
+.modal-config input[type="checkbox"],
+.modal-config select,
+.modal-config input[type="color"],
+.modal-config input[type="range"] {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  background: #333;
+  color: #eee;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
+
+body.dark .modal-config input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+
+body.dark .modal-config select,
+body.dark .modal-config input[type="color"],
+body.dark .modal-config input[type="range"] {
+  background: var(--panel-light);
+  color: var(--text-light);
+}
+input[type="checkbox"] {
+  width: auto !important;
+  display: inline-block;
+  accent-color: var(--primary);
+  height: 20px;
+  width: 20px;
+  margin-left: auto;
+}
+
+.modal-config .actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-config .save-btn,
+.modal-config .cancel-btn {
+  padding: 10px 18px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-config .save-btn {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.modal-config .save-btn:hover {
+  background-color: var(--hover-color);
+}
+
+.modal-config .cancel-btn {
+  background-color: #c0392b;
+  color: #fff;
+}
+
+.modal-config .cancel-btn:hover {
+  background-color: #e74c3c;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  #btn {
+    gap: 8px;
+  }
+  .settings-btn,
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  .modal-config .modal-box {
+    margin: 20px 10px;
+    padding: 20px;
+    max-width: 95%;
   }
 }

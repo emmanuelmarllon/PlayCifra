@@ -33,7 +33,10 @@
     <main>
       <h1>
         PlayCifra
-        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <div id="btn">
+          <button class="settings-btn" id="openSettings">⚙️</button>
+          <button class="theme-toggle" id="themeToggle">🌙</button>
+        </div>
       </h1>
       <!-- Barra de pesquisa -->
       <input
@@ -122,16 +125,18 @@
             placeholder="Ex: G"
             autocomplete="off"
           />
-          <label>Capotraste?</label>
-          <input type="checkbox" id="capoCheck" />
-          <input
-            type="number"
-            id="capoCasa"
-            min="1"
-            max="12"
-            placeholder="Casa"
-            style="width: 80px; display: none"
-          />
+          <div style="display: flex; align-items: center; gap: 10px">
+            <label>Capotraste?</label>
+            <input type="checkbox" id="capoCheck" />
+            <input
+              type="number"
+              id="capoCasa"
+              min="1"
+              max="12"
+              placeholder="Casa"
+              style="width: 80px; display: none"
+            />
+          </div>
           <label>Ritmo</label>
           <input
             type="text"
@@ -205,6 +210,80 @@
 
           <div class="actions">
             <button class="cancel-btn" id="closeViewModal">Fechar</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal modal-config" id="settingsModal">
+        <div class="modal-box">
+          <h2>Configurações</h2>
+
+          <label>
+            Tema:
+            <select id="themeSelect">
+              <option value="light">Escuro</option>
+              <option value="dark">Claro</option>
+              <option value="auto">Automático</option>
+            </select>
+          </label>
+
+          <label>
+            Cor principal:
+            <select id="colorSelect">
+              <option value="#4caf50">Verde</option>
+              <option value="#81c784">Verde Claro</option>
+              <option value="#1b5e20">Verde Escuro</option>
+
+              <option value="#2196f3">Azul</option>
+              <option value="#64b5f6">Azul Claro</option>
+              <option value="#0d47a1">Azul Escuro</option>
+
+              <option value="#e91e63">Rosa</option>
+              <option value="#f48fb1">Rosa Claro</option>
+              <option value="#880e4f">Rosa Escuro</option>
+
+              <option value="#ff9800">Laranja</option>
+              <option value="#ffcc80">Laranja Claro</option>
+              <option value="#e65100">Laranja Escuro</option>
+
+              <option value="#9c27b0">Roxo</option>
+              <option value="#ce93d8">Roxo Claro</option>
+              <option value="#4a148c">Roxo Escuro</option>
+
+              <option value="#f44336">Vermelho</option>
+              <option value="#ef9a9a">Vermelho Claro</option>
+              <option value="#b71c1c">Vermelho Escuro</option>
+
+              <option value="#607d8b">Cinza Azulado</option>
+              <option value="#90a4ae">Cinza Claro</option>
+              <option value="#263238">Cinza Escuro</option>
+
+              <option value="#795548">Marrom</option>
+              <option value="#a1887f">Marrom Claro</option>
+              <option value="#3e2723">Marrom Escuro</option>
+            </select>
+          </label>
+
+          <label style="display: flex; align-items: center; gap: 10px">
+            Destacar acordes com cor
+            <input
+              style="width: max-content"
+              type="checkbox"
+              id="highlightChords"
+            />
+          </label>
+
+          <label>
+            Tamanho da fonte:
+            <select id="fontSize">
+              <option value="0.75rem">Pequeno</option>
+              <option value="20px" selected>Médio</option>
+              <option value="30px">Grande</option>
+            </select>
+          </label>
+
+          <div class="actions">
+            <button class="cancel-btn" id="cancelSettings">Cancelar</button>
+            <button class="save-btn" id="saveSettings">Salvar</button>
           </div>
         </div>
       </div>

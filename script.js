@@ -74,6 +74,12 @@ const toggleDownBtn = $("toggleDown");
 
 // 2.7 – Tema
 const themeToggle = $("themeToggle");
+// 2.8 – Settings
+
+const openSettingsBtn = document.getElementById("openSettings");
+const settingsModal = document.getElementById("settingsModal");
+const cancelSettings = document.getElementById("cancelSettings");
+const saveSettings = document.getElementById("saveSettings");
 
 /* ────────────────────────────────────────────────────────────────────────
    3.  RUNTIME STATE
@@ -179,18 +185,12 @@ function render(list = songs, keepActive = activeSongId) {
   let visible = query
     ? list // se está pesquisando → todas
     : list.slice(0, 5); // senão → só 5
-
-  console.log("🔍 query:", query || "(vazio)");
-  console.table(visible.map((s) => s.title));
-
   /* ========== 2. “current” = música que deve ficar em 1º ========== */
   const current = keepActive && list.find((s) => s.id === keepActive);
-  console.log("🎯 current", current ? current.title : "nenhum");
 
   if (current) {
     visible = [current, ...visible.filter((s) => s.id !== current.id)];
   }
-  console.table(visible.map((s) => s.title));
 
   /* ========== 3. Limpa DOM ========== */
   tabsEl.innerHTML = "";
@@ -460,6 +460,133 @@ function fillViewList() {
   showMoreView.style.display =
     filtered.length > slice.length ? "block" : "none";
 }
+openSettingsBtn.addEventListener("click", () => {
+  settingsModal.style.display = "block";
+});
+
+cancelSettings.addEventListener("click", () => {
+  settingsModal.style.display = "none";
+});
+
+// Função pra escurecer um HEX
+function darkenHex(hex, percent = 20) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  let r = (num >> 16) - percent;
+  let g = ((num >> 8) & 0x00ff) - percent;
+  let b = (num & 0x0000ff) - percent;
+
+  r = Math.max(0, r);
+  g = Math.max(0, g);
+  b = Math.max(0, b);
+
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Função pra transformar HEX em rgba (pra sombra)
+function hexToRgba(hex, alpha = 0.5) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+saveSettings.addEventListener("click", () => {
+  const theme = document.getElementById("themeSelect").value;
+  const color = document.getElementById("colorSelect").value;
+  const highlight = document.getElementById("highlightChords").checked;
+  const fontSize = document.getElementById("fontSize").value;
+
+  localStorage.setItem("theme", theme);
+  localStorage.setItem("cifras_theme", theme);
+
+  localStorage.setItem("primaryColor", color);
+  localStorage.setItem("highlightChords", highlight);
+  localStorage.setItem("fontSize", fontSize);
+
+  // Atualiza as cores dinâmicas
+  document.documentElement.style.setProperty("--primary", color);
+  document.documentElement.style.setProperty(
+    "--shadow-color",
+    hexToRgba(color)
+  );
+  document.documentElement.style.setProperty("--hover-color", darkenHex(color));
+
+  // Agora só altera o #contents
+  document.querySelectorAll("#contents pre").forEach((el) => {
+    el.style.fontSize = fontSize;
+  });
+
+  // Aplica o tema
+  // Errado (inverteu dark e light)
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  } else if (theme === "light") {
+    document.body.classList.remove("dark");
+  } else {
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.body.classList.toggle("dark", isDark);
+  }
+  applyHighlightChords(highlight);
+
+  settingsModal.style.display = "none";
+});
+
+function applyHighlightChords(enabled) {
+  const contents = document.querySelectorAll("#contents pre code");
+
+  contents.forEach((el) => {
+    // Guarda o texto original no data-original (se ainda não tiver)
+    if (!el.dataset.original) {
+      el.dataset.original = el.textContent;
+    }
+
+    if (enabled) {
+      el.innerHTML = markChords(el.dataset.original);
+    } else {
+      el.textContent = el.dataset.original;
+    }
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("cifras_theme") || "dark";
+  const savedColor = localStorage.getItem("primaryColor") || "#4caf50";
+  const highlight = localStorage.getItem("highlightChords") === "true";
+  const fontSize = localStorage.getItem("fontSize") || "16px";
+
+  // Atualiza o select logo no começo
+  document.getElementById("themeSelect").value = savedTheme;
+  document.getElementById("colorSelect").value = savedColor;
+  document.getElementById("highlightChords").checked = highlight;
+  document.getElementById("fontSize").value = fontSize;
+
+  // Aplica as cores dinâmicas
+  document.documentElement.style.setProperty("--primary", savedColor);
+  document.documentElement.style.setProperty(
+    "--shadow-color",
+    hexToRgba(savedColor)
+  );
+  document.documentElement.style.setProperty(
+    "--hover-color",
+    darkenHex(savedColor)
+  );
+
+  // Aplica o font-size só no #contents
+  document.querySelectorAll("#contents pre").forEach((el) => {
+    el.style.fontSize = fontSize;
+  });
+
+  // Aplica o tema no body (adiciona ou remove a classe dark)
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+  applyHighlightChords(highlight);
+  // Atualiza o texto do botão junto para ficar sincronizado
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+});
+
 /* ────────────────────────────────────────────────────────────────────────
    8.  IMPORT / EXPORT
    ────────────────────────────────────────────────────────────────────── */
@@ -535,15 +662,15 @@ importAppendFile.onchange = (e) => {
    ────────────────────────────────────────────────────────────────────── */
 /*********************** TEMA ESCURO/CLARO **************/
 themeToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  themeToggle.textContent = document.body.classList.contains("dark")
-    ? "☀️"
-    : "🌙";
-  localStorage.setItem(
-    "cifras_theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  );
+  const isDark = document.body.classList.toggle("dark");
+  const theme = isDark ? "dark" : "light";
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  localStorage.setItem("cifras_theme", theme);
+
+  // Atualiza o select junto para não ficar desincronizado
+  document.getElementById("themeSelect").value = theme;
 };
+
 if (localStorage.getItem("cifras_theme") === "dark") {
   document.body.classList.add("dark");
   themeToggle.textContent = "☀️";
@@ -564,6 +691,9 @@ filterFavoritesBtn.onclick = () => {
   filterFavoritesBtn.style.backgroundColor = filterFavorites ? "#ffdddd" : "";
   render(filterFavorites ? songs.filter((s) => s.favorite) : songs);
 };
+console.log(
+  "Olá, desenvolvedor! ficou curioso como esse site e feito? acesse https://github.com/emmanuelmarllon/PlayCifra 👋"
+);
 /*********************** GLOBAL: COPIAR CIFRA **************/
 window.copiarTexto = copyToClipboard;
 /*********************** INIT *************************/
