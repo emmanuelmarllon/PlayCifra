@@ -379,6 +379,65 @@ function fillDelete() {
   showMoreDelete.style.display =
     filtered.length > slice.length ? "block" : "none";
 }
+const inputArtista = document.getElementById("inputArtista");
+const inputMusica = document.getElementById("inputMusica");
+const btnBuscar = document.getElementById("btnBuscar");
+const resultado = document.getElementById("resultado");
+const modal = document.getElementById("modalResult");
+const closeCifraModal = document.getElementById("closeCifraModal");
+
+btnBuscar.addEventListener("click", async () => {
+  const artista = inputArtista.value.trim().toLowerCase().replace(/\s+/g, "-");
+  const musica = inputMusica.value.trim().toLowerCase().replace(/\s+/g, "-");
+
+  if (!artista || !musica) {
+    resultado.textContent = "Preencha artista e música antes de buscar!";
+    abrirModal();
+    return;
+  }
+
+  resultado.textContent = "Carregando cifra...";
+
+  try {
+    const url = `https://cifraclub-api.vercel.app/api/cifra?artist=${artista}&song=${musica}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error("Cifra não encontrada");
+
+    const data = await res.json();
+    const cifraFormatada = data.cifra
+      ? data.cifra.join("\n")
+      : "Cifra não disponível";
+
+    resultado.innerHTML = `
+      <h2>${data.name} - ${data.artist}</h2>
+      <a href="${data.cifraclub_url}" target="_blank" rel="noopener noreferrer">Ver no Cifra Club</a>
+      <pre>${cifraFormatada}</pre>
+    `;
+
+    abrirModal();
+  } catch (err) {
+    resultado.textContent = "Erro ao buscar cifra 😥";
+    abrirModal();
+    console.error("Erro capturado:", err);
+  }
+});
+
+// 🧠 Abre o modal
+function abrirModal() {
+  modal.style.display = "block";
+}
+
+// 😴 Fecha ao clicar no X
+closeCifraModal.onclick = () => {
+  modal.style.display = "none";
+};
+
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+});
 
 /*********************** EDIT LIST MODAL **************/
 openEditListBtn.onclick = () => {

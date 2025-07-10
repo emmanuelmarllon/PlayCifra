@@ -1,0 +1,16 @@
+{
+    "name": "cifraclub-api",
+    "version": "1.0.0",
+    "main": "api/cifra.js",
+    "scripts": {
+      "start": "node server.js",
+      "dev": "node server.js"
+    },
+    "dependencies": {
+      "axios": "^1.6.0",
+      "cheerio": "^1.0.0-rc.12"
+    },
+    "engines": {
+      "node": "18.x"
+    }
+  }

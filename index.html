@@ -38,10 +38,44 @@
           <button class="theme-toggle" id="themeToggle">🌙</button>
         </div>
       </h1>
+      <p style="text-align: center">Buscar novas Cifras</p>
+      <div class="form-container">
+        <input type="text" id="inputArtista" placeholder="Artista" />
+        <input type="text" id="inputMusica" placeholder="Música" />
+        <button id="btnBuscar">Buscar cifra</button>
+      </div>
+
+      <!-- Modal da Cifra -->
+      <!-- Modal da Cifra -->
+      <div class="modal" id="modalResult">
+        <div class="modal-box">
+          <h2 id="modalTitleResult">Cifra da Música</h2>
+
+          <!-- Conteúdo da cifra com scroll interno -->
+          <div
+            id="resultado"
+            style="
+              max-height: 300px;
+              overflow-y: auto;
+              white-space: pre-wrap;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 8px;
+              background: var(--modal-bg);
+            "
+          ></div>
+
+          <div class="actions">
+            <button class="cancel-btn" id="closeCifraModal">Fechar</button>
+            <button class="save-btn" id="addBtn">Adicionar</button>
+          </div>
+        </div>
+      </div>
+      <p style="text-align: center">Buscar suas Cifras</p>
       <!-- Barra de pesquisa -->
       <input
         id="searchInput"
-        placeholder="Pesquisar música..."
+        placeholder="Pesquisar suas músicas..."
         autocomplete="off"
       />
       <div class="tabs" id="tabs"></div>
@@ -321,7 +355,9 @@
           <p><i class="fa fa-envelope"></i> email</p>
           <p>
             <i class="fa fa-github"></i>
-            <a href="https://github.com/" target="_blank">GitHub</a>
+            <a href="https://github.com/emmanuelmarllon" target="_blank"
+              >GitHub</a
+            >
           </p>
           <p>
             <i class="fa fa-instagram"></i>
